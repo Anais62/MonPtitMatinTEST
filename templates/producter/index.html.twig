@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nos partenaires - Mon P'tit Matin{% endblock %}
+
+{% block content %}
+    
+    <div class="producter mt-5 mb-5">
+        <h1 class="text-end">Nos partenaires</h1>
+        <div class="row">
+        {# Initialisation d'un compteur pour faire l'effet du gauche  droite #}
+        {% set compteur = 0 %}
+
+        {% for producter in producters %}
+
+            {# Pour afficher a gauche une fois sur deux #}
+            {% if compteur % 2 == 0 %}
+            
+            <div class="partenaire">
+                <div class="col-md-4">
+                    <img src='/uploads/{{ producter.illustration }}' alt="Notre "{{compteur + 1}}" partenaire">     {# POURQUOI LE + 1 psq mon compteur a start a 0 #}
+                </div>
+                <div class="col-md-7 my-auto">
+                    <p>
+                         {{ (producter.description|raw)  }}
+                    </p>
+                </div>
+            </div>
+
+            {% set compteur = compteur + 1  %}
+            {# Et hop on affiche a droite #}
+            {% elseif compteur % 2 != 0 %}
+                
+                
+            <div class="partenaire" style="text-align : end ;">
+                <div class="col-md-7 my-auto">
+                    <p>
+                      {{ producter.description|raw }}  
+                    </p>   
+                </div>
+                <div class="col-md-4">
+                    <img src='/uploads/{{ producter.illustration }}' alt="Notre "{{compteur + 1}}"ème partenaires">
+                </div>
+            </div>
+                {# Incrémentation #}
+            {% set compteur = compteur + 1 %} 
+            
+            {% endif %}
+            
+
+        {% endfor %}
+            
+
+            
+
+            
+        </div>
+    </div>
+{% endblock %}

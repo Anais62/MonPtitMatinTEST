@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon panier - Mon P'tit Matin{% endblock %}
+
+{% block content %}
+
+<div class="mb-5 ms-4 mt-4">
+    <h1>Mon panier</h1>
+    Retrouvez l'ensemble des produits que vous avez ajouté à votre panier.    
+</div> 
+{% set orderId = app.session.get('current_order_id') %}
+
+  {% if cart|length > 0 %} 
+    <div class="container">
+      <div class="d-flex justify-content-center">
+        <table class="table mx-auto">
+          <thead class="table-dark">
+            <tr class="text-center">
+              <th scope="col">Produits</th>
+              <th scope="col"></th>
+              <th scope="col">Quantité</th>
+              <th scope="col">Prix</th>
+              <th scope="col">Total</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set total = null %} 
+            {% set compteur = 0 %}
+            {% for formule in cart %}      
+             <tr>
+              <td class="text-center"><img src="/uploads/{{ formule.formule.formule.illustration }}" alt="{{ formule.formule.formule.title}}" height="75px"></td>
+              <td>
+                {{ formule.formule.formule.title }} <br><i>(
+                  {% for produit in formule.product.product %}
+                 
+                  {{ produit.name }} x 1,
+                  {% endfor %}  )</i>
+              </td>
+              <td class="text-center">
+              <a href="{{ path('app_decrease_quantity_to_cart', {'orderId' : formule.orderId}) }}">
+                -
+              </a>
+              {{ formule.formule.quantity }}
+              <a href="{{ path('app_add_quantity_to_cart', {'orderId' : formule.orderId}) }}">
+                +
+              </a>
+              </td>
+              <td class="text-center">{{ (formule.formule.formule.price / 100) |number_format(2, ',', '.') }} €</td>
+              <td class="text-center">{{ ((formule.formule.formule.price * formule.formule.quantity) / 100) |number_format(2, ',', '.') }} €</td>
+              <td>
+                <a href="{{ path('app_remove_my_cart', { 'orderId' : formule.orderId }) }}">
+                  <img src="{{ asset('assets/img/supprimer.png')}}" height="18px" alt="Supprimer mon produit">
+                </a>
+              </td>
+            </tr>
+              {% set total = total + (formule.formule.formule.price * formule.formule.quantity) %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex mt-3">
+     <div class="col-md-6">
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="deliveryTimeSlots">Choisissez une heure et une date livraison</label>
+        </br>
+        <select class="form-select" id="deliveryTimeSlots" name="deliveryTimeSlots">
+            {% for deliveryTimeSlot in allDeliveryTimeSlots %}
+                <option value="{{ deliveryTimeSlot.id }}">
+                    {% if deliveryTimeSlot.date|date('d/m') == "now"|date('d/m') %} 
+                        Aujourd'hui {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}
+                    {% else %}
+                        Demain      {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}
+                    {% endif %}
+                </option> 
+            {% endfor %}
+        </select>
+    </div>
+</div>
+     <div class="col-md-1">
+     </div>
+
+        <div class="col-md-5">
+          <div class="text-end">
+              <b>Nombre de formule :</b> {{ cart|length }}</br>
+              <b>Livraison :</b>  
+              {% for delivery in delivery %}
+                {{ (delivery.price / 100) |number_format(2, ',', '.') }}€
+                {% set livraison = (delivery.price / 100)  %}
+              
+               <br>
+              <b>Sous total :</b> {{ (total / 100) |number_format(2, ',', '.') }} €</br>
+              <b>Total de mon panier :</b> {{ ((total / 100) + livraison) |number_format(2, ',', '.') }} €
+              {% endfor %}
+              <a href="" class="btn btn-dark w-100 mt-3">Valider mon panier</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  {% else %}
+    <hr>
+    <p class="text-center"><b>Votre panier est vide</b></p>
+  {% endif %}
+
+{% endblock %}

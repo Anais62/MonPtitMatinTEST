@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nous contacter - La Boutique Française{% endblock %}
+
+{% block content %}
+<br>
+<div style="margin-left: 45px; margin-right: 45px;"> 
+    <h2>Nous contacter</h2>
+    <br>
+    {% for message in app.flashes('notice') %}
+        
+            <div class="alert alert-info">{{ message }}</div>
+        
+    {% endfor %}
+    <div class="row">
+        <div class="col-md-8"> {{ form(form) }}</div>
+        <div class="col-md-4">
+            <strong>Mon P'tit Matin</strong>
+            <hr>
+            07 20 30 40 50 <br>
+            8 Rue des Lylas fleuris, 62500 Saint-Omer <br>
+            monptitmatin.contactV2@gmail.com <br>
+        </div>
+     </div>
+</div>
+{% endblock %}
