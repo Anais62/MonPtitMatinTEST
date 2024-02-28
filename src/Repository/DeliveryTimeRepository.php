@@ -21,6 +21,16 @@ class DeliveryTimeRepository extends ServiceEntityRepository
         parent::__construct($registry, DeliveryTime::class);
     }
 
+
+    public function findByAvailableDeliveryTimes()
+    {
+        return $this->createQueryBuilder('deliveryTime')
+            ->where('deliveryTime.statu = true')
+            ->getQuery()
+            ->getResult();
+    }
+
+
 //    /**
 //     * @return DeliveryTime[] Returns an array of DeliveryTime objects
 //     */

@@ -142,8 +142,8 @@ class Address
     }
     public function __toString()
 {
-    return $this->getCity(); // Utilisez la méthode getCity() pour obtenir le nom de la ville
+    return $this->getName().'[br]'.$this->getFirstname().' '.$this->getLastname().'[br]'.$this->getAddress().'[br]'.$this->getPostal().' - '.$this->getCity();
+
+
 }
-
-
 }

@@ -29,15 +29,15 @@
             {% set compteur = 0 %}
             {% for formule in cart %}      
              <tr>
-              <td class="text-center"><img src="/uploads/{{ formule.formule.formule.illustration }}" alt="{{ formule.formule.formule.title}}" height="75px"></td>
-              <td>
+              <td class="text-center align-middle"><img src="/uploads/{{ formule.formule.formule.illustration }}" alt="{{ formule.formule.formule.title}}" height="75px"></td>
+              <td class ="align-middle">
                 {{ formule.formule.formule.title }} <br><i>(
                   {% for produit in formule.product.product %}
                  
-                  {{ produit.name }} x 1,
+                  {{ produit.name }} x {{ formule.formule.quantity }},
                   {% endfor %}  )</i>
               </td>
-              <td class="text-center">
+              <td class="text-center align-middle">
               <a href="{{ path('app_decrease_quantity_to_cart', {'orderId' : formule.orderId}) }}">
                 -
               </a>
@@ -46,10 +46,10 @@
                 +
               </a>
               </td>
-              <td class="text-center">{{ (formule.formule.formule.price / 100) |number_format(2, ',', '.') }} €</td>
-              <td class="text-center">{{ ((formule.formule.formule.price * formule.formule.quantity) / 100) |number_format(2, ',', '.') }} €</td>
-              <td>
-                <a href="{{ path('app_remove_my_cart', { 'orderId' : formule.orderId }) }}">
+              <td class="text-center align-middle">{{ (formule.formule.formule.price / 100) |number_format(2, ',', '.') }} €</td>
+              <td class="text-center align-middle">{{ ((formule.formule.formule.price * formule.formule.quantity) / 100) |number_format(2, ',', '.') }} €</td>
+              <td class='align-middle '>
+                <a href="{{ path('app_delete_to_cart', { 'orderId' : formule.orderId }) }}">
                   <img src="{{ asset('assets/img/supprimer.png')}}" height="18px" alt="Supprimer mon produit">
                 </a>
               </td>
@@ -60,28 +60,7 @@
         </table>
       </div>
 
-      <div class="d-flex mt-3">
-     <div class="col-md-6">
-    <div class="input-group mb-3">
-        <label class="input-group-text" for="deliveryTimeSlots">Choisissez une heure et une date livraison</label>
-        </br>
-        <select class="form-select" id="deliveryTimeSlots" name="deliveryTimeSlots">
-            {% for deliveryTimeSlot in allDeliveryTimeSlots %}
-                <option value="{{ deliveryTimeSlot.id }}">
-                    {% if deliveryTimeSlot.date|date('d/m') == "now"|date('d/m') %} 
-                        Aujourd'hui {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}
-                    {% else %}
-                        Demain      {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}
-                    {% endif %}
-                </option> 
-            {% endfor %}
-        </select>
-    </div>
-</div>
-     <div class="col-md-1">
-     </div>
-
-        <div class="col-md-5">
+      <div class="mt-3">
           <div class="text-end">
               <b>Nombre de formule :</b> {{ cart|length }}</br>
               <b>Livraison :</b>  
@@ -93,9 +72,9 @@
               <b>Sous total :</b> {{ (total / 100) |number_format(2, ',', '.') }} €</br>
               <b>Total de mon panier :</b> {{ ((total / 100) + livraison) |number_format(2, ',', '.') }} €
               {% endfor %}
-              <a href="" class="btn btn-dark w-100 mt-3">Valider mon panier</a>
+              <br>
+              <a href="{{ path('app_order') }}" class="btn btn-dark w-40p mt-3" id="validate-cart-btn">Valider mon panier</a>
           </div>
-        </div>
       </div>
     </div>
     
@@ -104,4 +83,14 @@
     <p class="text-center"><b>Votre panier est vide</b></p>
   {% endif %}
 
+
+<script>
+document.getElementById('validate-cart-btn').addEventListener('click', function() {
+    // Récupérer l'ID du créneau horaire sélectionné
+    var selectedDeliveryTimeSlotId = document.getElementById('deliveryTimeSlots').value;
+
+    // Ajouter l'ID du créneau horaire à l'URL du lien
+    this.href = this.href + '?deliveryTimeSlotId=' + selectedDeliveryTimeSlotId;
+});
+</script>
 {% endblock %}

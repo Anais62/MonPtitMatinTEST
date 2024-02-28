@@ -4,6 +4,20 @@
 
 {% block content %}
     <div class="row justify-content-center mt-5">
+                {% set panier = app.session.get('ajout-panier') %}
+                
+                {% if panier == true %}
+                    <div class="panier-add">                         
+                    {# <img id='cart' src="{{asset('assets/img/agriculteur.png')}}" alt="Mon panier" class="cart-icon"> #}
+
+                  
+                    
+                    <p class='text-center mt-2'>  <img src="{{asset('assets/img/valide.png')}}" alt="Validé" height='30px'> Ajouter au panier</p> 
+                                <div class="loading-bar"></div> <!-- Barre de chargement à l'intérieur de panier-add -->
+
+                    </div>
+                {% endif %}
+
         {% for product in formule %}
             <div class="col-md-5 formule">
                 <div class="formule-item shadow">
@@ -19,4 +33,23 @@
             </div>
         {% endfor %}
     </div>   
+     <script>
+        // Sélection de l'élément ajouté au panier
+        const panierAdd = document.querySelector('.panier-add');
+
+        // Fonction pour réinitialiser la session ajout-panier
+        function resetPanierSession() {
+            // Réinitialiser la session ajout-panier à false
+            {% set _ = app.session.set('ajout-panier', false) %}
+        }
+
+        // Ajouter une classe 'fade-out' après un délai de 5 secondes
+        setTimeout(() => {
+            panierAdd.classList.add('fade-out');
+            resetPanierSession();
+
+        }, 3000);
+
+        
+    </script>
 {% endblock %}

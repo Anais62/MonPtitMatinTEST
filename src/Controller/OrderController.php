@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Classe\Cart;
-use App\Entity\Delivery;
-use App\Entity\DeliveryTime; 
+use App\Entity\DeliveryTime;
+use App\Entity\Order;
+use App\Entity\OrderDetails;
 use App\Entity\WorkSchedule;
+use App\Form\OrderType;
 use DateInterval;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,11 +17,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-
-class CartController extends AbstractController
+class OrderController extends AbstractController
 {
-    private $entityManager;
+
     private $requestStack;
+    private $entityManager;
 
     public function __construct(RequestStack $requestStack, EntityManagerInterface $entityManager)
     {
@@ -26,11 +29,31 @@ class CartController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    #[Route('/mon-panier', name: 'app_cart')]
-    public function index(Cart $cart, Request $request): Response
+    #[Route('/commande', name: 'app_order')]
+    public function index(Request $request, Cart $cart): Response
     {
-        $delivery = $this->entityManager->getRepository(Delivery::class)->findAll();
-        
+
+        $request = $this->requestStack->getCurrentRequest();
+        $session = $request->getSession();
+
+        // Récupérer l'ID du créneau horaire depuis la requête
+        $deliveryTimeSlotId = $request->query->get('deliveryTimeSlotId');
+
+        // Stocker l'ID du créneau horaire dans la session
+        $session->set('selected_delivery_time_slot_id', $deliveryTimeSlotId);
+
+
+       if (!$this->getUser()->getAddresses()->getValues()) 
+       {
+            return $this->redirectToRoute('app_account_address_add');
+       }
+        $form = $this->createForm(OrderType::class, null, [
+            'user' => $this->getUser()
+        ]);
+
+
+        // Partie date de livraison
+
         $allDeliveryTimeSlots = $this->entityManager->getRepository(DeliveryTime::class)->findAll();
         // Récupérer le nom du jour actuel en français le jour +1 
         $dayName = date("l", strtotime('+1 day'));
@@ -52,15 +75,15 @@ class CartController extends AbstractController
 
         // Récupérer tous les créneaux horaires de la table delivery_time
         $allDeliveryTimeSlots = $this->entityManager->getRepository(DeliveryTime::class)->findAll();
-
-
-        return $this->render('cart/index.html.twig', [
+        
+        return $this->render('order/index.html.twig', [
+            'form' => $form->createView(),
             'cart' => $cart->getFull(),
-            'delivery' => $delivery,
             'workDays' => $workDays,
             'todaySchedules' => $todaySchedules,
-            'allDeliveryTimeSlots' => $allDeliveryTimeSlots, // Ajout de cette variable
+            'allDeliveryTimeSlots' => $allDeliveryTimeSlots,        
         ]);
+        
     }
 
     // Fonction pour obtenir les plages horaires disponibles pour une journée donnée
@@ -82,7 +105,6 @@ class CartController extends AbstractController
 
             $currentDate->setTime(0, 0, 0); // Réinitialise l'heure à 00:00:00
     
-
             while ($currentHour <= $endTimeLimit) {
                         $startSlot = $currentHour->format('H:i');
                         $currentHour->add($interval);
@@ -95,13 +117,10 @@ class CartController extends AbstractController
                     'time_end' => $endSlot // Ajoutez cette condition
                 ]);
 
-                //dd($existingSlot);
                 //SI SA MARCHE PAS IF DANS IF
 
                 if ($existingSlot === []) {
-                    // Le créneau n'existe pas encore en base de données, on peut l'ajouter
-                    
-                
+                    // Le créneau n'existe pas encore en base de données, on peut l'ajouter               
                         $deliveryTime = new DeliveryTime();
                         $deliveryTime->setTime($startSlot);
                         $deliveryTime->setTimeEnd($endSlot);
@@ -111,18 +130,9 @@ class CartController extends AbstractController
                         dump($deliveryTime);
                     }else {
                     continue;
-                }
-                    
+                }       
                     $this->entityManager->flush();
-                }
-                
-          
-                                //dd('test');
-
-           
-                   
-            // dd($deliveryTime);
-
+            }
         } else {
             $startTime = $day->getHeureDebut()->format('H:i');
             $endTime = $day->getHeureFin()->format('H:i');
@@ -135,68 +145,74 @@ class CartController extends AbstractController
             $deliveryTime->setTimeEnd($endTime);
             $deliveryTime->setDate($currentDate);
             $deliveryTime->setStatu($statuts);
-            //dd($deliveryTime);
 
             $existingSlot = $this->entityManager->getRepository(DeliveryTime::class)->findBy([
                 'date' => $currentDate,
-                'time' => $startTime,  // Ajoutez cette condition
-                'time_end' => $endTime // Ajoutez cette condition
+                'time' => $startTime,
+                'time_end' => $endTime 
             ]);
             if ($existingSlot == []) {
                 $this->entityManager->persist($deliveryTime);
                 $this->entityManager->flush();
-
             }
         }
     
         return $availableTimeSlots;
     }
-    #[Route('/cart/add/{id}/{productIdsArray}', name: 'app_add_to_cart')]
-    public function add(Cart $cart, $id, $productIdsArray) : Response
+
+    #[Route('/commande/recapitulatif', name: 'app_order_recap')]
+    public function add(Cart $cart, Request $request): Response
     {
-        $productIds = explode(',', $productIdsArray);
+       
+        $form = $this->createForm(OrderType::class, null, [
+            'user' => $this->getUser()
+        ]);
 
-        $cart->add($id, $productIds);
-        $request = $this->requestStack->getCurrentRequest();
+        $form->handleRequest($request);
 
-        $session = $request->getSession();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $date = new DateTime();
+            $delivery = $form->get('delivery')->getData();
+            $addresses = $form->get('addresses')->getData();
+            $delivery_content = $addresses->getfirstname().' '.$addresses->getLastname();
+            $delivery_content .= '<br/>'.$addresses->getphone();
+            $delivery_content .= '<br/>'.$addresses->getaddress();
+            $delivery_content .= '<br/>'.$addresses->getPostal();
+            $delivery_content .= ' '.$addresses->getCity();
+            
 
-        $session->set('ajout-panier', true );
+            $order = new Order();
+            $order->setUser($this->getUser());
+            $order->setCreatedAt($date);
+            $order->setDeliveryName($delivery->getName());
+            $order->setDeliveryPrice($delivery->getPrice());
+            $order->setAddressDelivery($delivery_content);
+            $order->setIsPaid(0);
 
-        return $this->redirectToRoute('app_product');
+            
+            foreach($cart->getFull() as $formule) {
+                $orderDetails = new OrderDetails();
+                $orderDetails->setMyorder($order);
+                $orderDetails->setFormule($formule['formule']['formule']->getTitle());
+                $orderDetails->setFormule($formule['formule']['quantity']);
+                    dd($formule['formule']['quantity']);
+                    $produits = [];
+               foreach ($formule['product']['product'] as $produit) {
+                dump($produit->getName());
+                
+                $produits[] = $produit->getName();
+                $orderDetails->setProduct($produit->getName()); 
+                                               dump($orderDetails);
+
+               }             
+
+            }
+                           dd('test')    ;
+
+         }
+   
+        return $this->render('order/add.html.twig', [
+            'cart' => $cart->getFull()
+        ]);
     }
-
-    #[Route('/cart/remove', name: 'app_remove_my_cart')]
-    public function remove(Cart $cart) : Response
-    {
-        $cart->remove();
-
-        return $this->redirectToRoute('app_product');
-    }
-
-    #[Route('/cart/delete/{orderId}', name: 'app_delete_to_cart')]
-    public function delete(Cart $cart, $orderId) : Response
-    {
-        $cart->delete($orderId);
-
-        return $this->redirectToRoute('app_cart');
-    }
-
-    #[Route('/cart/add_quantity/{orderId}', name: 'app_add_quantity_to_cart')]
-    public function add_quantity(Cart $cart, $orderId) : Response
-    {
-        $cart->add_quantity($orderId);
-
-        return $this->redirectToRoute('app_cart');
-    }
-
-    #[Route('/cart/decrease_quantity/{orderId}', name: 'app_decrease_quantity_to_cart')]
-    public function decrease_quantity(Cart $cart, $orderId) : Response
-    {
-        $cart->decrease_quantity($orderId);
-
-        return $this->redirectToRoute('app_cart');
-    }
-
-    
 }

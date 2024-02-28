@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Valider ma commande - Mon P'tit Matin{% endblock %}
+
+{% block content %}
+<div class="order mt-3">
+    <h2>Je passe ma commande</h2>
+    <p>Choisissez vos préférences avant de passer votre commande sur Mon P'tit Matin</p>
+    <hr>
+        <div class="row">
+            <div class="col-md-5">    
+            {% set formHtml %}
+                {{ form_start(form, {action:path('app_order_recap')}) }}
+                {{ form_end(form) }}
+            {% endset %}
+            
+            {{ formHtml|replace({'[br]' : '<br>', '[sp]' : ' '})|raw }}
+
+
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-6 croller">
+            <b>Récap de ma commande</b>
+
+                    {% for formule in cart %}      
+                    <div class="row mt-2">
+                    <div class="col-4 my-auto"><img src="/uploads/{{ formule.formule.formule.illustration }}" alt="{{ formule.formule.formule.title }}" height="75px"></div>
+                    <div class="col-6 my-auto"><strong>{{ formule.formule.formule.title }}</strong><br><small><i>(
+                        {% for produit in formule.product.product %}
+                        
+                        {{ produit.name }} x {{ formule.formule.quantity }},
+                        {% endfor %}  )</i></small></div>
+                    <div class="col">x  {{ formule.formule.quantity }}</div>
+                    </div>
+        
+                    {% endfor %}
+        
+            </div>
+        </div>
+</div>
+
+<script>
+    document.getElementById('deliveryTimeSlots').addEventListener('change', function() {
+        var selectedValue = this.value;
+        console.log("ID du créneau horaire sélectionné : " + selectedValue);
+    });
+</script>
+{% endblock %}
+
+
+{# <select class="form-select" id="deliveryTimeSlots" name="deliveryTimeSlots">
+    <option value="" hidden selected disabled>Choisissez une heure et une date de livraison</option>
+        {% for deliveryTimeSlot in allDeliveryTimeSlots %}
+        {% if deliveryTimeSlot.statu == true %}                 
+            <option value="{{ deliveryTimeSlot.id }}">
+                {% if deliveryTimeSlot.date|date('d/m') == "now"|date('d/m') %} 
+                    Aujourd'hui {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}
+                {% else %}
+                    Demain      {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}
+                {% endif %}
+            </option> 
+            {% else %}
+            {% if deliveryTimeSlot.date|date('d/m') == "now"|date('d/m') %} 
+
+                <option value="" disabled title="Indisponible - Aujourd'hui {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}">
+                Aujourd'hui {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }} 
+                </option>
+            {% else %}
+                <option value="" disabled title="Indisponible - Demain {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }}">
+                Demain {{ deliveryTimeSlot.date|date('d/m') }} - {{ deliveryTimeSlot.time|date('H:i') }} - {{ deliveryTimeSlot.timeEnd|date('H:i') }} 
+                </option>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+</select> #}

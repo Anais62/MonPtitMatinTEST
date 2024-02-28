@@ -25,7 +25,7 @@ class DeliveryTimeCrudController extends AbstractCrudController
             DateField::new('date'),
             TextField::new('time'),
             TextField::new('time_end'),
-            BooleanField::new('statu'),
+            BooleanField::new('statu','disponible'),
 
         ];
     }

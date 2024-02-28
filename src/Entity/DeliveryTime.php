@@ -21,7 +21,7 @@ class DeliveryTime
     private ?string $time = null;
 
     #[ORM\Column]
-    private ?bool $statu = false;
+    private ?bool $statu = true;
 
     #[ORM\Column(length: 255)]
     private ?string $time_end = null;
@@ -79,6 +79,82 @@ class DeliveryTime
 
         return $this;
     }
+
+    public function __toString()
+    {
+        $jour = $this->getDate();
+        $nomJour = '';
+        $nomMois = '';
+
+        switch ($jour->format('l')) {
+            case 'Monday':
+                $nomJour = 'Lundi';
+                break;
+            case 'Tuesday':
+                $nomJour = 'Mardi';
+                break;
+            case 'Wednesday':
+                $nomJour = 'Mercredi';
+                break;
+            case 'Thursday':
+                $nomJour = 'Jeudi';
+                break;
+            case 'Friday':
+                $nomJour = 'Vendredi';
+                break;
+            case 'Saturday':
+                $nomJour = 'Samedi';
+                break;
+            case 'Sunday':
+                $nomJour = 'Dimanche';
+                break;
+        }
+
+        switch ($jour->format('F')) {
+            case 'January':
+                $nomMois = 'Janvier';
+                break;
+            case 'February':
+                $nomMois = 'Février';
+                break;
+            case 'March':
+                $nomMois = 'Mars';
+                break;
+            case 'April':
+                $nomMois = 'Avril';
+                break;
+            case 'May':
+                $nomMois = 'Mai';
+                break;
+            case 'June':
+                $nomMois = 'Juin';
+                break;
+            case 'July':
+                $nomMois = 'Juillet';
+                break;
+            case 'August':
+                $nomMois = 'Août';
+                break;
+            case 'September':
+                $nomMois = 'Septembre';
+                break;
+            case 'October':
+                $nomMois = 'Octobre';
+                break;
+            case 'November':
+                $nomMois = 'Novembre';
+                break;
+            case 'December':
+                $nomMois = 'Décembre';
+                break;
+        }
+
+        $dateChiffre = $jour->format('d');
+        $MoisLettre = $nomMois;
+
+        return $nomJour.' '.$dateChiffre.' '.$MoisLettre.' : '.$this->time.' - '.$this->time_end;
+    }
+
 
 
 }

@@ -57,7 +57,9 @@ class Cart
         }
         $totalItems = $totalItems/2 ;
         $session->set('current_order_id', $orderId);
-        $session->set('nb-cart', $totalItems);
+        $totalItems = $session->get('nb-cart') + 1;
+
+        $session->set('nb-cart', $totalItems );
         $session->set('cart', $cart);
 
         return $orderId;
@@ -84,19 +86,22 @@ class Cart
     {
         $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
-    
+        
         $cart = $session->get('cart', []);
         
-        $totalItems = $session->get('nb-cart') - 1;
+        // Récupérer la quantité de formules dans la commande
+        $formuleQuantity = $cart[$orderId]['formule']['quantity'];
         
+        // Mettre à jour le nombre total d'articles en fonction de la quantité de formules
+        $totalItems = $session->get('nb-cart') - $formuleQuantity;
         $session->set('nb-cart', $totalItems);
-
-
-
+    
+        // Supprimer complètement l'élément du panier
         unset($cart[$orderId]);
-
+    
         return $session->set('cart', $cart);
     }
+    
     
     public function add_quantity($orderId){
         $request = $this->requestStack->getCurrentRequest();
@@ -142,5 +147,38 @@ class Cart
 
 
     }
+
+    public function getFull()
+{
+    $request = $this->requestStack->getCurrentRequest();
+    $session = $request->getSession();
+
+    $cart = $session->get('cart', []);
+
+    $cartComplete = [];
+
+    foreach ($cart as $orderId => $orderDetails) {
+        $formule = $orderDetails['formule']['formule'];
+        $formuleQuantity = $orderDetails['formule']['quantity'];
+        
+        $products = $orderDetails['product']['product'];
+        $productQuantity = $orderDetails['product']['quantity'];
+
+        $cartComplete[$orderId] = [
+            'formule' => [
+                'formule' => $formule,
+                'quantity' => $formuleQuantity,
+            ],
+            'product' => [
+                'product' => $products,
+                'quantity' => $productQuantity,
+            ],
+            'orderId' => $orderId,
+        ];
+    }
+
+    return $cartComplete;
+}
+
 
 }
