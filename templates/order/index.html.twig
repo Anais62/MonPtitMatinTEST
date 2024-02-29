@@ -11,6 +11,7 @@
             <div class="col-md-5">    
             {% set formHtml %}
                 {{ form_start(form, {action:path('app_order_recap')}) }}
+                    
                 {{ form_end(form) }}
             {% endset %}
             
@@ -38,6 +39,8 @@
             </div>
         </div>
 </div>
+
+
 
 <script>
     document.getElementById('deliveryTimeSlots').addEventListener('change', function() {

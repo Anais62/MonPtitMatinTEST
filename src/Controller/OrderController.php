@@ -160,7 +160,7 @@ class OrderController extends AbstractController
         return $availableTimeSlots;
     }
 
-    #[Route('/commande/recapitulatif', name: 'app_order_recap')]
+    #[Route('/commande/recapitulatif', name: 'app_order_recap', methods:['POST'] )]
     public function add(Cart $cart, Request $request): Response
     {
        
@@ -172,6 +172,8 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $date = new DateTime();
+            $deliveryTimeSlotId = $form->get('deliveryTimeSlot')->getData()->getId();
+            dd($deliveryTimeSlotId);
             $delivery = $form->get('delivery')->getData();
             $addresses = $form->get('addresses')->getData();
             $delivery_content = $addresses->getfirstname().' '.$addresses->getLastname();
@@ -189,30 +191,38 @@ class OrderController extends AbstractController
             $order->setAddressDelivery($delivery_content);
             $order->setIsPaid(0);
 
+            $this->entityManager->persist($order);
             
             foreach($cart->getFull() as $formule) {
+               
+
+                     //dd($formule['formule']['formule']->getPrice());
+               foreach ($formule['product']['product'] as $produit) {
+           
                 $orderDetails = new OrderDetails();
                 $orderDetails->setMyorder($order);
                 $orderDetails->setFormule($formule['formule']['formule']->getTitle());
-                $orderDetails->setFormule($formule['formule']['quantity']);
-                    dd($formule['formule']['quantity']);
-                    $produits = [];
-               foreach ($formule['product']['product'] as $produit) {
-                dump($produit->getName());
-                
-                $produits[] = $produit->getName();
+                $orderDetails->setQuantity($formule['formule']['quantity']);
+                $orderDetails->setPrice($formule['formule']['formule']->getPrice());
+                $total = $formule['formule']['formule']->getPrice() * $formule['formule']['quantity'] ;
+                $orderDetails->setTotal($total);
                 $orderDetails->setProduct($produit->getName()); 
-                                               dump($orderDetails);
+              
+                    $this->entityManager->persist($orderDetails);
+                    
 
                }             
-
+                   
+                    $this->entityManager->flush();
             }
-                           dd('test')    ;
+            return $this->render('order/add.html.twig', [
+            'cart' => $cart->getFull(),
+            'delivery' => $delivery,
+            'addresses' => $delivery_content
+        ]);
 
          }
-   
-        return $this->render('order/add.html.twig', [
-            'cart' => $cart->getFull()
-        ]);
+         return $this->redirectToRoute('app_cart');
+        
     }
 }

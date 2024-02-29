@@ -25,7 +25,7 @@ class DeliveryTimeRepository extends ServiceEntityRepository
     public function findByAvailableDeliveryTimes()
     {
         return $this->createQueryBuilder('deliveryTime')
-            ->where('deliveryTime.statu = true')
+            //->where('deliveryTime.statu = true')
             ->getQuery()
             ->getResult();
     }

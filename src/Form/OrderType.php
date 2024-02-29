@@ -27,13 +27,27 @@ class OrderType extends AbstractType
         $user = $options['user'];
 
         $builder
+
         ->add('deliveryTimeSlot', EntityType::class, [
             'label' => 'Créneaux horaires disponibles',
             'required' => true,
             'class' => DeliveryTime::class,
             'choices' => $this->deliveryTimeRepository->findByAvailableDeliveryTimes(),
+            'choice_label' => function ($deliveryTime) {
+                return $deliveryTime instanceof DeliveryTime ?
+                    ($deliveryTime->isStatu() ? $deliveryTime->__toString() : $deliveryTime->__toString().' '.'Indisponible')  :
+                    'Indisponible';
+            },
+            'choice_attr' => function($choice, $key, $value) {
+                if ($choice instanceof DeliveryTime && !$choice->isStatu()) {
+                    return ['disabled' => 'disabled' , 
+                    'title' =>  "Indisponible" ];
+                }
+                return [];
+            },
             'placeholder' => 'Sélectionnez un créneau horaire',
         ])
+        
         
         ->add('addresses', EntityType::class, [
             'label' => 'Choisissez votre adresse de livraison',

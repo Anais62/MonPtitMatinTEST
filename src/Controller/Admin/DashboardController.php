@@ -7,6 +7,7 @@ use App\Entity\City;
 use App\Entity\Delivery;
 use App\Entity\DeliveryTime;
 use App\Entity\Formule;
+use App\Entity\Order;
 use App\Entity\Producter;
 use App\Entity\Products;
 use App\Entity\User;
@@ -61,6 +62,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Livraison', 'fas fa-truck', Delivery::class);
         yield MenuItem::linkToCrud('Horaires de travail', 'fas fa-clock', WorkSchedule::class);
         yield MenuItem::linkToCrud('Plage horaire', 'fas fa-clock', DeliveryTime::class);
+        yield MenuItem::linkToCrud('Commande', 'fas fa-shopping-cart ', Order::class);
 
     }
 }

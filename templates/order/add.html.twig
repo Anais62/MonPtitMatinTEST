@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement de ma commande - Mon P'tit Matin{% endblock %}
+
+{% block content %}
+<div class="order mt-3">
+    <h2>Mon récapitulatif</h2>
+    <p>Vérifiez vos informations avant de payer votre commande.</p>
+    <hr>
+    <div class="row">
+        <div class="col-md-5">    
+           <strong> Mon adresse de livraison :</strong> <br>
+           {{ addresses|raw }}
+            
+            <hr>
+            <strong>Livraison : </strong> <br>
+           
+           {{ delivery.name|replace({'[sp]': ' '}) }}<br>
+            
+
+            {{ ((delivery.price)/100) | number_format(2, ',', '.') }} €
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-6 croller">
+            <b>Récap de ma commande</b>
+            <p>Retrouvez le récapitulatif de vos formules</p>
+            {% set total = 0 %}
+            {% for formule in cart %}      
+                <div class="row mt-2">
+                    <div class="col-4 my-auto">
+                        <img src="/uploads/{{ formule.formule.formule.illustration }}" alt="{{ formule.formule.formule.title }}" height="75px">
+                    </div>
+                    <div class="col-6 my-auto">
+                        <strong>{{ formule.formule.formule.title }}</strong><br>
+                        <small><i>(
+                            {% for produit in formule.product.product %}
+                                {{ produit.name }} x {{ formule.formule.quantity }},
+                            {% endfor %}
+                            )</i></small>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex justify-content-between">
+                            <span>x  {{ formule.formule.quantity }}</span>
+                            <strong><span>{{ ((formule.formule.formule.price * formule.formule.quantity) / 100) |number_format(2, ',', '.') }} €</span></strong>
+                        </div>
+                    </div>
+                </div>
+                {% set total = total + (formule.formule.formule.price * formule.formule.quantity) %}
+            {% endfor %}
+        </div>
+        
+
+        <div class="mt-3">
+    <div class="text-end">
+    
+        <b>Sous-Total :</b> {{ (total / 100) | number_format(2, ',', '.') }} €<br>
+        <b>Livraison :</b> {{ ((delivery.price)/100) | number_format(2, ',', '.') }} €<br>
+        <b>Total :</b> {{ ((total + delivery.price) / 100) | number_format(2, ',', '.') }} €<br>
+        <a href="" class="btn btn-success mt-3 text-center">Payer {{ ((total + delivery.price) / 100) | number_format(2, ',', '.') }} €</a>
+    </div>
+</div>
+</div>
+</div>
+<script>
+    document.getElementById('deliveryTimeSlots').addEventListener('change', function() {
+        var selectedValue = this.value;
+        console.log("ID du créneau horaire sélectionné : " + selectedValue);
+    });
+</script>
+{% endblock %}

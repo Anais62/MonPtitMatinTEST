@@ -39,9 +39,24 @@ class Order
     #[ORM\Column]
     private ?bool $isPaid = null;
 
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?DeliveryTime $delivery = null;
+
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
+    }
+
+    public function getTotal(){
+        $total = null; 
+
+        foreach ($this->getOrderDetails()->getValues() as $formule ) 
+        {
+           $total = $total + ($formule->getPrice() * $formule->getQuantity());
+        }
+        return $total;
+
     }
 
     public function getId(): ?int
@@ -147,6 +162,18 @@ class Order
     public function setIsPaid(bool $isPaid): static
     {
         $this->isPaid = $isPaid;
+
+        return $this;
+    }
+
+    public function getDelivery(): ?DeliveryTime
+    {
+        return $this->delivery;
+    }
+
+    public function setDelivery(?DeliveryTime $delivery): static
+    {
+        $this->delivery = $delivery;
 
         return $this;
     }
