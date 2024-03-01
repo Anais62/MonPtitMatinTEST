@@ -57,6 +57,8 @@ class OrderController extends AbstractController
         $allDeliveryTimeSlots = $this->entityManager->getRepository(DeliveryTime::class)->findAll();
         // Récupérer le nom du jour actuel en français le jour +1 
         $dayName = date("l", strtotime('+1 day'));
+        $dayName2 = date("l", strtotime('today'));
+
         $dayNamesInFrench = [
             "Monday" => "Lundi",
             "Tuesday" => "Mardi",
@@ -66,6 +68,12 @@ class OrderController extends AbstractController
             "Saturday" => "Samedi",
             "Sunday" => "Dimanche"
         ];
+        $dayName2French = $dayNamesInFrench[$dayName2];
+        $today2 = $this->entityManager->getRepository(WorkSchedule::class)->findByDay($dayName2French)[0];
+
+        $todaySchedules2 = $this->getAvailableTimeSlots2($today2);
+
+
         $dayNameFrench = $dayNamesInFrench[$dayName];
         $workDays = $this->entityManager->getRepository(WorkSchedule::class)->findAll();
 
@@ -81,12 +89,90 @@ class OrderController extends AbstractController
             'cart' => $cart->getFull(),
             'workDays' => $workDays,
             'todaySchedules' => $todaySchedules,
+            'todaySchedules2' => $todaySchedules2,
+
             'allDeliveryTimeSlots' => $allDeliveryTimeSlots,        
         ]);
         
     }
 
     // Fonction pour obtenir les plages horaires disponibles pour une journée donnée
+    private function getAvailableTimeSlots2($day)
+    {
+        $availableTimeSlots = [];
+        if ($day->isWork()) {
+                   // dd($day->isWork());
+
+            $startTime = $day->getHeureDebut();
+            $endTime = $day->getHeureFin();
+            $endTimeLimit = clone $endTime;
+            $endTimeLimit->sub(new DateInterval('PT30M'));
+    
+            $currentHour = clone $startTime;
+            $interval = new DateInterval('PT30M');
+    
+            $currentDate = new \DateTime('today');
+            $currentDateFormatted = $currentDate->format('Y-m-d');
+
+            $currentDate->setTime(0, 0, 0); // Réinitialise l'heure à 00:00:00
+    
+            while ($currentHour <= $endTimeLimit) {
+                        $startSlot = $currentHour->format('H:i');
+                        $currentHour->add($interval);
+                        $endSlot = $currentHour->format('H:i');
+                        $availableTimeSlots[] = "$startSlot - $endSlot";  
+                // Vérifier si le créneau existe déjà en base de données
+                $existingSlot = $this->entityManager->getRepository(DeliveryTime::class)->findBy([
+                    'date' => $currentDate,
+                    'time' => $startSlot,  // Ajoutez cette condition
+                    'time_end' => $endSlot // Ajoutez cette condition
+                ]);                
+                //dd($existingSlot);
+
+
+                //SI SA MARCHE PAS IF DANS IF
+
+                if ($existingSlot === []) {
+                    // Le créneau n'existe pas encore en base de données, on peut l'ajouter               
+                        $deliveryTime = new DeliveryTime();
+                        $deliveryTime->setTime($startSlot);
+                        $deliveryTime->setTimeEnd($endSlot);
+                        $deliveryTime->setDate($currentDate);
+                
+                        $this->entityManager->persist($deliveryTime);
+                        dump($deliveryTime);
+                        dd($deliveryTime);
+                    }else {
+                    continue;
+                }       
+                    $this->entityManager->flush();
+            }
+        } else {
+            $startTime = $day->getHeureDebut()->format('H:i');
+            $endTime = $day->getHeureFin()->format('H:i');
+            $currentDate = new \DateTime('today');
+            $statuts = false;
+            $currentDate->setTime(0, 0, 0); // Réinitialise l'heure à 00:00:00
+
+            $deliveryTime = new DeliveryTime();
+            $deliveryTime->setTime($startTime);
+            $deliveryTime->setTimeEnd($endTime);
+            $deliveryTime->setDate($currentDate);
+            $deliveryTime->setStatu($statuts);
+
+            $existingSlot = $this->entityManager->getRepository(DeliveryTime::class)->findBy([
+                'date' => $currentDate,
+                'time' => $startTime,
+                'time_end' => $endTime 
+            ]);
+            if ($existingSlot == []) {
+                $this->entityManager->persist($deliveryTime);
+                $this->entityManager->flush();
+            }
+        }
+    
+        return $availableTimeSlots;
+    }
     private function getAvailableTimeSlots($day)
     {
         $availableTimeSlots = [];
@@ -159,6 +245,7 @@ class OrderController extends AbstractController
     
         return $availableTimeSlots;
     }
+    
 
     #[Route('/commande/recapitulatif', name: 'app_order_recap', methods:['POST'] )]
     public function add(Cart $cart, Request $request): Response
@@ -172,8 +259,7 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $date = new DateTime();
-            $deliveryTimeSlotId = $form->get('deliveryTimeSlot')->getData()->getId();
-            dd($deliveryTimeSlotId);
+            $deliveryTimeSlotId = $form->get('deliveryTimeSlot')->getData();
             $delivery = $form->get('delivery')->getData();
             $addresses = $form->get('addresses')->getData();
             $delivery_content = $addresses->getfirstname().' '.$addresses->getLastname();
@@ -190,13 +276,18 @@ class OrderController extends AbstractController
             $order->setDeliveryPrice($delivery->getPrice());
             $order->setAddressDelivery($delivery_content);
             $order->setIsPaid(0);
+            $order->setDelivery($deliveryTimeSlotId);
+
+            $deliverystatu = $this->entityManager->getRepository(DeliveryTime::class)->findOneById($deliveryTimeSlotId->getId());
+                   
+            $deliverystatu->setStatu(false);
 
             $this->entityManager->persist($order);
             
             foreach($cart->getFull() as $formule) {
                
 
-                     //dd($formule['formule']['formule']->getPrice());
+                     
                foreach ($formule['product']['product'] as $produit) {
            
                 $orderDetails = new OrderDetails();
@@ -213,12 +304,13 @@ class OrderController extends AbstractController
 
                }             
                    
-                    $this->entityManager->flush();
+                   //$this->entityManager->flush();
             }
             return $this->render('order/add.html.twig', [
             'cart' => $cart->getFull(),
             'delivery' => $delivery,
-            'addresses' => $delivery_content
+            'addresses' => $delivery_content,
+            'horaire' => $deliveryTimeSlotId
         ]);
 
          }

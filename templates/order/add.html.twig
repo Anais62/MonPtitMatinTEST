@@ -14,11 +14,17 @@
             
             <hr>
             <strong>Livraison : </strong> <br>
+            
            
            {{ delivery.name|replace({'[sp]': ' '}) }}<br>
             
 
             {{ ((delivery.price)/100) | number_format(2, ',', '.') }} €
+            <hr>
+        <strong>Horaire de livraison : </strong><br>
+        {{ horaire }}
+        
+        
         </div>
         <div class="col-md-1"></div>
         <div class="col-md-6 croller">

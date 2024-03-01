@@ -62,6 +62,12 @@ class CartController extends AbstractController
             'allDeliveryTimeSlots' => $allDeliveryTimeSlots, // Ajout de cette variable
         ]);
     }
+    private function deletePastSchedules()
+    {
+
+
+        
+    }
 
     // Fonction pour obtenir les plages horaires disponibles pour une journée donnée
     private function getAvailableTimeSlots($day)
