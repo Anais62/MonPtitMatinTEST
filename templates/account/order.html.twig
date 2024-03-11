@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes commandes - Mon P'tit Matin {% endblock %}
+
+{% block content %}
+<br>
+<a href="{{ path('app_account') }}">
+    <img id='redirection' src="{{ asset('assets/img/fleche-droite.png')}}" alt="retour">
+</a>
+<center><h1>Mes commandes</h1></center>
+
+<center>C'est dans cette espace que vous allez pouvoir gérer toutes vos commandes. </center><br>
+
+
+
+<br>
+
+{% if orders | length == 0 %}
+    <p class="text-center">
+        Vous n'avez pas encore passé de commande.
+    </p>
+{% else %}
+    <div class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Passée le</th>
+                    <th scope="col">Référence</th>
+                    <th scope="col">Formule</th>
+                    <th scope="col">Total</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <th scope="row">{{ order.createdAt|date('d/m/Y') }}</th>
+                    <td><span class="badge text-bg-secondary">{{ order.reference }}</span></td>
+                    <td>{{ order.numberFormule }}</td>
+                    <td>{{ ((order.total / 100)  + order.deliveryPrice / 100) |number_format(2, ',', '.')  }} €</td>
+                    <td><a href="">Voir ma commande</a></td>
+                </tr>        
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+{% endblock %}

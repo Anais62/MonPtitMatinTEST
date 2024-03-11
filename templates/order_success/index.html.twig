@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmation de ma commande - Mon P'tit Matin{% endblock %}
+
+{% block content %}
+<div class="container mt-2">
+    <h2>Confirmation de commande</h2>
+        <p>
+            Bonjour <strong>{{ order.user.name }} {{ order.user.firstname }}</strong>,<br><br>
+            Nous vous remercions pour votre commande n°<strong>{{ order.reference }}</strong>.<br>
+            Une confirmation vient de vous être envoyée par email à l'adresse <strong>{{ order.user.email }}</strong>.
+            <hr>
+            Votre commande sera livrée à l'adresse suivante : <br>
+            {{ order.addressDelivery|raw }}
+            <hr>
+            Pour suivre votre commande, rendez-vous dans votre <a href="{{ path('app_account_order') }}">compte</a>
+        </p>
+</div>
+{% endblock %}

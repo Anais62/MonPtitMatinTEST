@@ -43,21 +43,25 @@ class Order
     #[ORM\JoinColumn(nullable: false)]
     private ?DeliveryTime $delivery = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $reference = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripeSessionId = null;
+
+    #[ORM\Column]
+    private ?int $numberFormule = null;
+
+    #[ORM\Column]
+    private ?float $total = null;
+
+
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
     }
 
-    public function getTotal(){
-        $total = null; 
 
-        foreach ($this->getOrderDetails()->getValues() as $formule ) 
-        {
-           $total = $total + ($formule->getPrice() * $formule->getQuantity());
-        }
-        return $total;
-
-    }
 
     public function getId(): ?int
     {
@@ -177,4 +181,54 @@ class Order
 
         return $this;
     }
+
+    public function getReference(): ?string
+    {
+        return $this->reference;
+    }
+
+    public function setReference(string $reference): static
+    {
+        $this->reference = $reference;
+
+        return $this;
+    }
+
+    public function getStripeSessionId(): ?string
+    {
+        return $this->stripeSessionId;
+    }
+
+    public function setStripeSessionId(?string $stripeSessionId): static
+    {
+        $this->stripeSessionId = $stripeSessionId;
+
+        return $this;
+    }
+
+    public function getNumberFormule(): ?int
+    {
+        return $this->numberFormule;
+    }
+
+    public function setNumberFormule(int $numberFormule): static
+    {
+        $this->numberFormule = $numberFormule;
+
+        return $this;
+    }
+
+    public function getTotal(): ?float
+    {
+        return $this->total;
+    }
+
+    public function setTotal(float $total): static
+    {
+        $this->total = $total;
+
+        return $this;
+    }
+
+   
 }

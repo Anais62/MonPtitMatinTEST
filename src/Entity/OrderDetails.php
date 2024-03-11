@@ -32,6 +32,9 @@ class OrderDetails
     #[ORM\Column]
     private ?float $price = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $formuleId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +108,18 @@ class OrderDetails
     public function setPrice(float $price): static
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getFormuleId(): ?string
+    {
+        return $this->formuleId;
+    }
+
+    public function setFormuleId(string $formuleId): static
+    {
+        $this->formuleId = $formuleId;
 
         return $this;
     }

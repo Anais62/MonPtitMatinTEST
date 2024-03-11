@@ -8,9 +8,11 @@ use App\Entity\Order;
 use App\Entity\OrderDetails;
 use App\Entity\WorkSchedule;
 use App\Form\OrderType;
+use App\Repository\DeliveryTimeRepository;
 use DateInterval;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use SebastianBergmann\CodeCoverage\Report\Xml\Totals;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,9 +32,9 @@ class OrderController extends AbstractController
     }
 
     #[Route('/commande', name: 'app_order')]
-    public function index(Request $request, Cart $cart): Response
+    public function index(Request $request, Cart $cart, DeliveryTimeRepository $repo): Response
     {
-
+        $repo -> veriTenMinutesBis();
         $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
 
@@ -90,7 +92,6 @@ class OrderController extends AbstractController
             'workDays' => $workDays,
             'todaySchedules' => $todaySchedules,
             'todaySchedules2' => $todaySchedules2,
-
             'allDeliveryTimeSlots' => $allDeliveryTimeSlots,        
         ]);
         
@@ -140,12 +141,11 @@ class OrderController extends AbstractController
                         $deliveryTime->setDate($currentDate);
                 
                         $this->entityManager->persist($deliveryTime);
-                        dump($deliveryTime);
-                        dd($deliveryTime);
+              
                     }else {
                     continue;
                 }       
-                    $this->entityManager->flush();
+                    //$this->entityManager->flush();
             }
         } else {
             $startTime = $day->getHeureDebut()->format('H:i');
@@ -173,10 +173,11 @@ class OrderController extends AbstractController
     
         return $availableTimeSlots;
     }
+
     private function getAvailableTimeSlots($day)
     {
         $availableTimeSlots = [];
-        //dd($day->isWork());
+
         if ($day->isWork()) {
             $startTime = $day->getHeureDebut();
             $endTime = $day->getHeureFin();
@@ -248,15 +249,14 @@ class OrderController extends AbstractController
     
 
     #[Route('/commande/recapitulatif', name: 'app_order_recap', methods:['POST'] )]
-    public function add(Cart $cart, Request $request): Response
+    public function add(Cart $cart, Request $request, DeliveryTimeRepository $repo): Response
     {
-       
+        $repo -> veriTenMinutesBis();
         $form = $this->createForm(OrderType::class, null, [
             'user' => $this->getUser()
         ]);
-
+        $nb_formule = 0 ;
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $date = new DateTime();
             $deliveryTimeSlotId = $form->get('deliveryTimeSlot')->getData();
@@ -270,6 +270,8 @@ class OrderController extends AbstractController
             
 
             $order = new Order();
+            $reference = $date->format('dmY').'-'.uniqid();
+            $order->setReference($reference);
             $order->setUser($this->getUser());
             $order->setCreatedAt($date);
             $order->setDeliveryName($delivery->getName());
@@ -282,10 +284,10 @@ class OrderController extends AbstractController
                    
             $deliverystatu->setStatu(false);
 
-            $this->entityManager->persist($order);
             
             foreach($cart->getFull() as $formule) {
-               
+                $nb_formule = $nb_formule + 1 ;
+               $uniqid = uniqid();
 
                      
                foreach ($formule['product']['product'] as $produit) {
@@ -294,23 +296,46 @@ class OrderController extends AbstractController
                 $orderDetails->setMyorder($order);
                 $orderDetails->setFormule($formule['formule']['formule']->getTitle());
                 $orderDetails->setQuantity($formule['formule']['quantity']);
+                $orderDetails->setFormuleId($uniqid);
+                // for ($i=0; $i <$produit ; $i++) { 
+                //     dump($formule['formule']['quantity']);
+
+                // }
+                
                 $orderDetails->setPrice($formule['formule']['formule']->getPrice());
                 $total = $formule['formule']['formule']->getPrice() * $formule['formule']['quantity'] ;
                 $orderDetails->setTotal($total);
                 $orderDetails->setProduct($produit->getName()); 
               
-                    $this->entityManager->persist($orderDetails);
+                $this->entityManager->persist($orderDetails);
                     
 
                }             
-                   
-                   //$this->entityManager->flush();
+               $session = $request->getSession();
+               $carts = $session->get('cart', []);
+               $totalOrder = 0 ;
+
+               foreach ($carts as $test) {
+                $totalOrder = $totalOrder + $test['formule']['formule']->getPrice() * $test['formule']['quantity'];
+               // dump($totalOrder);
+               }
+              // dd($totalOrder);
+               $order->setTotal($totalOrder);
+               $nb_formule = $session->get('nb-cart');
+               $order->setNumberFormule($nb_formule);
+
+               $this->entityManager->persist($order);
+
+                $this->entityManager->flush();
             }
+            //dd('test');
+
             return $this->render('order/add.html.twig', [
             'cart' => $cart->getFull(),
             'delivery' => $delivery,
             'addresses' => $delivery_content,
-            'horaire' => $deliveryTimeSlotId
+            'horaire' => $deliveryTimeSlotId,
+            'reference' => $order->getReference()
         ]);
 
          }

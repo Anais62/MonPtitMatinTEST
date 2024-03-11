@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur de paiement - Mon P'tit Matin!{% endblock %}
+ 
+{% block content %}
+<div class="container mt-2">
+    <h2>Erreur de paiement</h2>
+        <p>
+            Bonjour <strong>{{ order.user.name }} {{ order.user.firstname }}</strong>,<br><br>
+            Il semblerait que votre paiement est échoué pour votre commande n°<strong>{{ order.reference }}</strong>.<br>
+            Une confirmation d'erreur vient de vous être envoyée par email à l'adresse <strong>{{ order.user.email }}</strong>.
+            <hr>
+        </p>
+        <a href="{{ path('app_order') }}" class="btn btn-dark">Réessayer le paiement</a>
+</div>
+{% endblock %}

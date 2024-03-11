@@ -40,8 +40,11 @@ class OrderType extends AbstractType
             },
             'choice_attr' => function($choice, $key, $value) {
                 if ($choice instanceof DeliveryTime && !$choice->isStatu()) {
-                    return ['disabled' => 'disabled' , 
-                    'title' =>  "Indisponible" ];
+                    $dayOfWeekClass = strtolower($choice->getDate()->format('l'));
+                    return [
+                        'class' => 'unavailable ' . $dayOfWeekClass,
+                        'disabled' => 'disabled' , 
+                        'title' =>  "Indisponible" ];
                 }
                 return [];
             },

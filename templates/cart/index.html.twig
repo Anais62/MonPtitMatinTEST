@@ -62,7 +62,7 @@
 
       <div class="mt-3">
           <div class="text-end">
-              <b>Nombre de formule :</b> {{ cart|length }}</br>
+              <b>Nombre de formule :</b> {{ nbCart }}</br>
               <b>Livraison :</b>  
               {% for delivery in delivery %}
                 {{ (delivery.price / 100) |number_format(2, ',', '.') }}€

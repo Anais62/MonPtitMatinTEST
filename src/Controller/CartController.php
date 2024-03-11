@@ -6,6 +6,7 @@ use App\Classe\Cart;
 use App\Entity\Delivery;
 use App\Entity\DeliveryTime; 
 use App\Entity\WorkSchedule;
+use App\Repository\DeliveryTimeRepository;
 use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,13 +28,16 @@ class CartController extends AbstractController
     }
 
     #[Route('/mon-panier', name: 'app_cart')]
-    public function index(Cart $cart, Request $request): Response
+    public function index(Cart $cart, Request $request, ): Response
     {
+        //$repo -> veriTenMinutesBis();
         $delivery = $this->entityManager->getRepository(Delivery::class)->findAll();
         
         $allDeliveryTimeSlots = $this->entityManager->getRepository(DeliveryTime::class)->findAll();
         // Récupérer le nom du jour actuel en français le jour +1 
         $dayName = date("l", strtotime('+1 day'));
+        $dayName2 = date("l", strtotime('today'));
+
         $dayNamesInFrench = [
             "Monday" => "Lundi",
             "Tuesday" => "Mardi",
@@ -43,6 +47,11 @@ class CartController extends AbstractController
             "Saturday" => "Samedi",
             "Sunday" => "Dimanche"
         ];
+        $dayName2French = $dayNamesInFrench[$dayName2];
+        $today2 = $this->entityManager->getRepository(WorkSchedule::class)->findByDay($dayName2French)[0];
+
+        $todaySchedules2 = $this->getAvailableTimeSlots2($today2);
+
         $dayNameFrench = $dayNamesInFrench[$dayName];
         $workDays = $this->entityManager->getRepository(WorkSchedule::class)->findAll();
 
@@ -62,11 +71,93 @@ class CartController extends AbstractController
             'allDeliveryTimeSlots' => $allDeliveryTimeSlots, // Ajout de cette variable
         ]);
     }
+
+
+    
     private function deletePastSchedules()
     {
 
 
         
+    }
+
+
+
+
+    private function getAvailableTimeSlots2($day)
+    {
+        $availableTimeSlots = [];
+        if ($day->isWork()) {
+                   // dd($day->isWork());
+
+            $startTime = $day->getHeureDebut();
+            $endTime = $day->getHeureFin();
+            $endTimeLimit = clone $endTime;
+            $endTimeLimit->sub(new DateInterval('PT30M'));
+    
+            $currentHour = clone $startTime;
+            $interval = new DateInterval('PT30M');
+    
+            $currentDate = new \DateTime('today');
+            $currentDateFormatted = $currentDate->format('Y-m-d');
+
+            $currentDate->setTime(0, 0, 0); // Réinitialise l'heure à 00:00:00
+    
+            while ($currentHour <= $endTimeLimit) {
+                        $startSlot = $currentHour->format('H:i');
+                        $currentHour->add($interval);
+                        $endSlot = $currentHour->format('H:i');
+                        $availableTimeSlots[] = "$startSlot - $endSlot";  
+                // Vérifier si le créneau existe déjà en base de données
+                $existingSlot = $this->entityManager->getRepository(DeliveryTime::class)->findBy([
+                    'date' => $currentDate,
+                    'time' => $startSlot,  // Ajoutez cette condition
+                    'time_end' => $endSlot // Ajoutez cette condition
+                ]);                
+                //dd($existingSlot);
+
+
+                //SI SA MARCHE PAS IF DANS IF
+
+                if ($existingSlot === []) {
+                    // Le créneau n'existe pas encore en base de données, on peut l'ajouter               
+                        $deliveryTime = new DeliveryTime();
+                        $deliveryTime->setTime($startSlot);
+                        $deliveryTime->setTimeEnd($endSlot);
+                        $deliveryTime->setDate($currentDate);
+                
+                        $this->entityManager->persist($deliveryTime);
+              
+                    }else {
+                    continue;
+                }       
+                    $this->entityManager->flush();
+            }
+        } else {
+            $startTime = $day->getHeureDebut()->format('H:i');
+            $endTime = $day->getHeureFin()->format('H:i');
+            $currentDate = new \DateTime('today');
+            $statuts = false;
+            $currentDate->setTime(0, 0, 0); // Réinitialise l'heure à 00:00:00
+
+            $deliveryTime = new DeliveryTime();
+            $deliveryTime->setTime($startTime);
+            $deliveryTime->setTimeEnd($endTime);
+            $deliveryTime->setDate($currentDate);
+            $deliveryTime->setStatu($statuts);
+
+            $existingSlot = $this->entityManager->getRepository(DeliveryTime::class)->findBy([
+                'date' => $currentDate,
+                'time' => $startTime,
+                'time_end' => $endTime 
+            ]);
+            if ($existingSlot == []) {
+                $this->entityManager->persist($deliveryTime);
+                $this->entityManager->flush();
+            }
+        }
+    
+        return $availableTimeSlots;
     }
 
     // Fonction pour obtenir les plages horaires disponibles pour une journée donnée

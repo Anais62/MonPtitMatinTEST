@@ -6,6 +6,14 @@ use App\Entity\Order;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Order>
+ *
+ * @method Order|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Order|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Order[]    findAll()
+ * @method Order[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
 class OrderRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -13,31 +21,34 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
-    /**
-     * Trouve les commandes impayées créées il y a plus d'un certain nombre de minutes.
-     *
-     * @param int $minutes Nombre de minutes seuil
-     *
-     * @return Order[] Retourne un tableau d'objets Order qui correspondent aux critères
-     */
-    public function findUnpaidOrdersOlderThanMinutes($minutes)
-    {
-        // Calcul du seuil temporel basé sur l'heure actuelle et le nombre de minutes spécifié
-        $timeThreshold = new \DateTime();
-        $timeThreshold->sub(new \DateInterval('PT' . $minutes . 'M'));
-
-        // Crée un constructeur de requête pour l'entité Order
+    public function findSuccessOrders($user) {
+        
         return $this->createQueryBuilder('o')
-            // Ajoute des conditions pour filtrer les commandes impayées et les commandes créées avant le seuil
-            ->andWhere('o.isPaid = false')
-            ->andWhere('o.createdAt < :timeThreshold')
-            // Définit le paramètre pour le seuil temporel dans la requête
-            ->setParameter('timeThreshold', $timeThreshold)
-            // Obtient la requête finale
-            ->getQuery()
-            // Exécute la requête et retourne le résultat sous forme d'un tableau d'objets Order
-            ->getResult();
+        ->andWhere('o.isPaid = 1')
+        ->andWhere('o.user = :user')
+        ->setParameter('user', $user)
+        ->orderBy('o.id', 'DESC')
+        ->getQuery()
+        ->getResult();
+       
     }
 
-    // Ajoutez d'autres méthodes personnalisées si nécessaire
+//    public function findByExampleField($value): array
+//    {
+//        return $this->createQueryBuilder('o')
+//             ->select()
+//            ->getQuery()
+//            ->getResult()
+//        ;
+//    }
+
+//    public function findOneBySomeField($value): ?Order
+//    {
+//        return $this->createQueryBuilder('o')
+//            ->andWhere('o.exampleField = :val')
+//            ->setParameter('val', $value)
+//            ->getQuery()
+//            ->getOneOrNullResult()
+//        ;
+//    }
 }

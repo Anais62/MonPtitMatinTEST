@@ -5,8 +5,9 @@
 {% block content %}
     
     <div class="producter mt-5 mb-5">
-        <h1 class="text-end">Nos partenaires</h1>
-        <div class="row">
+    
+        <h1 class="text-end mb-4">Nos partenaires</h1>
+
         {# Initialisation d'un compteur pour faire l'effet du gauche  droite #}
         {% set compteur = 0 %}
 
@@ -14,33 +15,37 @@
 
             {# Pour afficher a gauche une fois sur deux #}
             {% if compteur % 2 == 0 %}
-            
-            <div class="partenaire">
-                <div class="col-md-4">
-                    <img src='/uploads/{{ producter.illustration }}' alt="Notre "{{compteur + 1}}" partenaire">     {# POURQUOI LE + 1 psq mon compteur a start a 0 #}
-                </div>
-                <div class="col-md-7 my-auto">
+
+            <div class="row featurette">
+                <div class="col-md-7 order-md-2 text-center d-flex align-items-center">
                     <p>
-                         {{ (producter.description|raw)  }}
+                        {{ producter.description|raw }}
                     </p>
                 </div>
+                <div class="col-md-5 order-md-1 d-flex align-items-center justify-content-center">
+                    <img src='/uploads/{{ producter.illustration }}' class="img-fluid" alt="Notre "{{compteur + 1}}" partenaire">  {# POURQUOI LE + 1 psq mon compteur a start a 0 #}    
+                </div>
             </div>
+            
+            <hr class="featurette-divider">
 
             {% set compteur = compteur + 1  %}
             {# Et hop on affiche a droite #}
             {% elseif compteur % 2 != 0 %}
                 
                 
-            <div class="partenaire" style="text-align : end ;">
-                <div class="col-md-7 my-auto">
+            <div class="row featurette">
+                <div class="col-md-7 text-center d-flex align-items-center">
                     <p>
-                      {{ producter.description|raw }}  
-                    </p>   
+                        {{ producter.description|raw }}
+                    </p>
                 </div>
-                <div class="col-md-4">
-                    <img src='/uploads/{{ producter.illustration }}' alt="Notre "{{compteur + 1}}"ème partenaires">
+                <div class="col-md-5 d-flex align-items-center justify-content-center">
+                    <img src='/uploads/{{ producter.illustration }}' class="img-fluid" alt="Notre "{{compteur + 1}}"ème partenaire">       
                 </div>
             </div>
+
+            <hr class="featurette-divider">
                 {# Incrémentation #}
             {% set compteur = compteur + 1 %} 
             
@@ -48,11 +53,6 @@
             
 
         {% endfor %}
-            
 
-            
-
-            
-        </div>
-    </div>
+        
 {% endblock %}
