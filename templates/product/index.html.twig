@@ -3,20 +3,44 @@
 {% block title %}Nos produits - Mon P'tit matin{% endblock %}
 
 {% block content %}
+
+<br>
     <div class="row justify-content-center mt-5">
                 {% set panier = app.session.get('ajout-panier') %}
                 
-                {% if panier == true %}
-                    <div class="panier-add">                         
-                    {# <img id='cart' src="{{asset('assets/img/agriculteur.png')}}" alt="Mon panier" class="cart-icon"> #}
+{% if panier == true %}
+<style>
+    #cadeau1 {
+        opacity: 1;
+        animation: mouvement 0.54s 5 alternate; /* Appliquer l'animation trois fois */
+    }
+    #cadeau3 {
+        opacity: 1;
+        animation: mouvement 0.5s 5 alternate; /* Appliquer l'animation trois fois */
+    }
 
-                  
-                    
-                    <p class='text-center mt-2'>  <img src="{{asset('assets/img/valide.png')}}" alt="Validé" height='30px'> Ajouter au panier</p> 
-                                <div class="loading-bar"></div> <!-- Barre de chargement à l'intérieur de panier-add -->
+    @keyframes mouvement {
+        0% {
+            transform: translateY(0px); /* Position initiale */
+        }
+        100% {
+            transform: translateY(-12px); /* Déplacer vers le haut */
+        }
+    }
+</style>
 
-                    </div>
-                {% endif %}
+
+<a id='panierAdd' href="{{ path('app_cart') }}">
+    <div class="panier-add">
+        {# <img id='cart' src="{{asset('assets/img/agriculteur.png')}}" alt="Mon panier" class="cart-icon"> #}
+        <p class='text-center mt-2'>
+            <img src="{{asset('assets/img/valide.png')}}" alt="Validé" height='30px'> Ajouter au panier
+            <img class='ms-3' id='panierFleche' src="{{ asset('assets/img/fleche-droite.png')}}" alt="retour" height="30px">
+        </p> 
+        <div class="loading-bar"></div> <!-- Barre de chargement à l'intérieur de panier-add -->
+    </div>
+</a>
+{% endif %}
 
         {% for product in formule %}
             <div class="col-md-5 formule">
@@ -49,7 +73,34 @@
             resetPanierSession();
 
         }, 3000);
+           // Vérifier lorsque l'opacité atteint 0 et changer le display en none
+    panierAdd.addEventListener('transitionend', function(event) {
+        if (event.propertyName === 'opacity' && event.target.classList.contains('fade-out')) {
+            if (window.getComputedStyle(event.target).getPropertyValue('opacity') === '0') {
+                event.target.style.display = 'none';
+            }
+        }
+    });
 
-        
+            const cadeau = document.querySelector('#cadeau1');
+    let animationCount = 0;
+
+    // Événement déclenché à chaque itération de l'animation
+    cadeau.addEventListener('animationiteration', function() {
+        animationCount++;
+        if (animationCount === 4) {
+            cadeau.style.opacity = '0'; // Modifier l'opacité à 0 après trois répétitions
+        }
+    });
+              const cadeau2 = document.querySelector('#cadeau3');
+    let animationCount2 = 0;
+
+    // Événement déclenché à chaque itération de l'animation
+    cadeau2.addEventListener('animationiteration', function() {
+        animationCount2++;
+        if (animationCount2 === 4) {
+            cadeau2.style.opacity = '0'; // Modifier l'opacité à 0 après trois répétitions
+        }
+    });
     </script>
 {% endblock %}

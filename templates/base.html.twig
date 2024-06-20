@@ -1,10 +1,64 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="{{ asset('assets/tarteaucitron/tarteaucitron.js') }}"></script>
+        <script>
+        tarteaucitron.init({
+            "privacyUrl": "", /* Privacy policy url */
+            "bodyPosition": "bottom", /* or top to bring it as first element for accessibility */
+
+            "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
+            "cookieName": "tarteaucitron", /* Cookie name */
+
+            "orientation": "middle", /* Banner position (top - bottom - middle - popup) */
+
+            "groupServices": false, /* Group services by category */
+            "showDetailsOnClick": true, /* Click to expand the description */
+            "serviceDefaultState": "wait", /* Default state (true - wait - false) */
+
+            "showAlertSmall": false, /* Show the small banner on bottom right */
+            "cookieslist": false, /* Show the cookie list */
+            
+            "showIcon": true, /* Show cookie icon to manage cookies */
+            // "iconSrc": "", /* Optional: URL or base64 encoded image */
+            "iconPosition": "BottomRight", /* Position of the icon between BottomRight, BottomLeft, TopRight and TopLeft */
+
+            "adblocker": true, /* Show a Warning if an adblocker is detected */
+
+            "DenyAllCta" : true, /* Show the deny all button */
+            "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
+            "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
+
+            "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
+
+            "removeCredit": false, /* Remove credit link */
+            "moreInfoLink": true, /* Show more info link */
+            "useExternalCss": false, /* If false, the tarteaucitron.css file will be loaded */
+            "useExternalJs": false, /* If false, the tarteaucitron.services.js file will be loaded */
+
+            // "cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for subdomain website */
+
+            "readmoreLink": "", /* Change the default readmore link pointing to tarteaucitron.io */
+            
+            "mandatory": true, /* Show a message about mandatory cookies */
+            "mandatoryCta": true, /* Show the disabled accept button when mandatory on */
+            
+            // "customCloserId": "", /* Optional a11y: Custom element ID used to open the panel */
+
+            "googleConsentMode": true, /* Enable Google Consent Mode v2 for Google ads and GA4 */
+            
+            "partnersList": false /* Details the number of partners on the popup and middle banner */
+        });
+
+          tarteaucitron.user.multiplegtagUa = ['UA-97102682-4'];
+          (tarteaucitron.job = tarteaucitron.job || []).push('multiplegtag');
+        </script>
+
         <meta charset="UTF-8">
         <title>{% block title %}Mon p'tit matin!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         <link rel="stylesheet" href="{{ asset('build/vendor.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=0.86, maximum-scale=5.0, minimum-scale=0.86" />
         <script src="{{ asset('build/vendor.js') }}" defer></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +84,8 @@
           });
 
         </script>
+        
+        
         
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
@@ -61,7 +117,7 @@
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="{{path ('app_product')}}">Nos formules |</a>
               </li>
-                        <li class="nav-item">
+              <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="{{path ('app_producter')}}">Nos partenaires</a>
               </li>
             </ul>

@@ -4,10 +4,12 @@
 
 {% block content %}
     <div class="page-produit mt-5">
-        <div class="row image-option justify-content-around">
-            <div class="col-md-5">
-                <img src="/uploads/{{ formule.illustration }}" alt="{{ formule.title }}" class="image_produit">
+        <div class="row image-option justify-content-between">
+            <div class="col-md-6">
+                <img src="/uploads/{{ formule.illustration }}" alt="{{ formule.title }}" class="image_produit mb-3  ">
+                
                 <h2 class='text-center'>{{ formule.title }}</h2>
+                <br>
             </div>
             
             <div class="col-md-5">
@@ -21,12 +23,14 @@
                                     </button>
                                 </h2>
                                 <div id="collapse{{ category.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion">
-                                    <div class="accordion-body">
+                                   <div class="accordion-body">
                                         {% for product in products %}
                                             {% if product.category == category %}
                                                 <label class="check mb-2">
                                                     <input type="checkbox" class="product-checkbox" value="{{ product.id }}" data-category="{{ category.id }}">
                                                     <span>{{ product.name }}</span>
+                                                    {# <a href="#" class="add-product" data-product-id="{{ product.id }}">+</a>
+                                                    <a href="#" class="remove-product" data-product-id="{{ product.id }}">-</a> #}
                                                 </label>
                                             {% endif %}
                                         {% endfor %}
@@ -68,6 +72,8 @@
             // Si la case est cochée, vérifier le nombre total de produits sélectionnés
             if (selectedProducts >= nb_product) {
                 $(this).prop('checked', false);
+                
+
             } else {
                 selectedProducts++;
                 nb_restant.innerText = nb_product - selectedProducts;
@@ -107,9 +113,43 @@ $(document).ready(function() {
             // Retirer l'ID du produit de la liste
             selectedProductIds = selectedProductIds.filter(id => id !== productId);
         }
+        // Si dans le tableau des produits séléctionné il y a notre product id , on s'en sert dans le + et le - 
+        if (selectedProductIds.includes(productId)) {
+                    console.log("affiche :", productId);
+        // RAYAN DU FUTUR C'EST HIDE ET SHOW qui ne marche pas
+            $(this).next('.add-product').hide();
+            $(this).next('.remove-product').show();
+        } else {
+                    console.log("n'affiche pas :", productId);
+
+            $(this).next('.add-product').show();
+            $(this).next('.remove-product').hide();
+        }
         
         console.log("IDs des produits sélectionnés :", selectedProductIds);
     });
+
+    // Gestion de l'ajout de produit
+    $('.add-product').click(function(e) {
+        e.preventDefault();
+        var productId = $(this).data('product-id');
+        // Ajouter l'ID du produit à la liste
+        selectedProductIds.push(productId);
+        console.log("IDs des produits sélectionnés :", selectedProductIds);
+    });
+
+    // Gestion de la suppression de produit
+$('.remove-product').click(function(e) {
+    e.preventDefault();
+    var productId = $(this).data('product-id');
+    // Trouver l'index de l'productId dans selectedProductIds
+    var index = selectedProductIds.indexOf(productId);
+    if (index !== -1) {
+        // Retirer l'élément de selectedProductIds à cet index
+        selectedProductIds.splice(index, 1);
+    }
+    console.log("IDs des produits sélectionnés :", selectedProductIds);
+});
 
     // Gestion de la soumission du formulaire
     $('#addToCartBtn').click(function(e) {
@@ -127,6 +167,5 @@ $(document).ready(function() {
         window.location.href = url;
     });
 });
-
 </script>
 {% endblock %}

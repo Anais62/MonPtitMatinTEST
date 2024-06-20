@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "bootstrap": "^5.3.3",
-        "fullcalendar": "^6.1.11"
+        "fullcalendar": "^6.1.11",
+        "tarteaucitronjs": "^1.17.0"
     }
 }

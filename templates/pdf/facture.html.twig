@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Facture</title>
+    <!-- Ajoutez ici vos styles CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .invi{
+            display:none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Facture</h1>
+        <pre>
+            
+        </pre>
+        <p>{{ data.user.firstname }} {{ data.user.name }}</p>
+         {% set addressParts = data.adress|split('<br/>') %}
+        <p class='invi'>{{ addressParts[0] }}</p>
+        <p>{{ addressParts[1] }}</p>
+        <p>{{ addressParts[2] }}</p>
+        <table>
+            <thead>
+                     <tr>
+            <th scope="col" class="text-center">Formule</th>
+            <th scope="col" class="text-center">Quantité</th>
+            <th scope="col" class="text-center">Produits</th>
+            <th scope="col" class="text-center">Prix unitaire</th>
+            <th scope="col" class="text-center">Prix total</th>
+        </tr>
+            </thead>
+            <tbody>
+                    {% set groupedFormules = {} %}
+
+                 {% for formule in order.orderDetails %}
+            {% set formuleKey = formule.formuleId %}
+            {% set groupedFormules = groupedFormules|merge({(formuleKey): groupedFormules[formuleKey]|default([])|merge([formule])}) %}
+        {% endfor %}
+
+        {% for formuleKey, formules in groupedFormules %}
+
+            <tr>
+                <td scope="row" class="text-center">{{ formules[0].formule }}</td>
+                <td class="text-center">{{ formules[0].quantity }}</td>
+                <td class="text-center">{{ formules|map(item => item.product)|join(', ') }}</td>
+                <td class="text-center">{{ (formules[0].price / 100) |number_format(2, ',', '.') }} €</td>
+                <td class="text-center">{{ (formules[0].total / 100) |number_format(2, ',', '.')}} €</td>
+            </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+        
+        <p>Fait à Longuenesse, le {{ "now"|date("Y-m-d") }}</p>
+    </div>
+</body>
+</html>

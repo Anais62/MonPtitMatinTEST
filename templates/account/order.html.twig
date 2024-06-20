@@ -7,7 +7,7 @@
 <a href="{{ path('app_account') }}">
     <img id='redirection' src="{{ asset('assets/img/fleche-droite.png')}}" alt="retour">
 </a>
-<center><h1>Mes commandes</h1></center>
+<center><h1>Mes commandes </h1></center>
 
 <center>C'est dans cette espace que vous allez pouvoir gérer toutes vos commandes. </center><br>
 
@@ -34,11 +34,12 @@
             <tbody>
                 {% for order in orders %}
                 <tr>
+               
                     <th scope="row">{{ order.createdAt|date('d/m/Y') }}</th>
                     <td><span class="badge text-bg-secondary">{{ order.reference }}</span></td>
                     <td>{{ order.numberFormule }}</td>
                     <td>{{ ((order.total / 100)  + order.deliveryPrice / 100) |number_format(2, ',', '.')  }} €</td>
-                    <td><a href="">Voir ma commande</a></td>
+                    <td class="text-end"><a href="{{ path('app_account_order_show', { 'reference' : order.reference }) }}">Voir ma commande</a></td>
                 </tr>        
                 {% endfor %}
             </tbody>

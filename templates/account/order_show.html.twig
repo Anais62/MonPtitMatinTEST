@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma commande - Mon P'tit Matin {% endblock %}
+
+{% block content %}
+<div class="container">
+    <br>
+    <a href="{{ path('app_account_order') }}">
+        <img id='redirection' src="{{ asset('assets/img/fleche-droite.png')}}" alt="retour">
+    </a>
+    <br>
+    <br>
+    <div class="text-center">
+        <h2>Ma commande {{ order.reference }}</h2>
+    </div>
+    <br>
+
+    <div class="alert alert-primary" role="alert">
+        <strong>Commande passée le :</strong> {{ order.createdAt|date('d/m/Y') }} <br>
+        <strong>Référence de la commande :</strong> {{ order.reference }} <br>
+        <strong>Date et horaire de livraison :</strong> {{ order.delivery }} <br>
+        <strong>Type de livraison :</strong> {{ order.deliveryName|replace({ '[sp]' : ' '}) }} <br>
+        <strong>Statut de la commande : </strong>
+        {% if order.isPaid == 1 %}
+            Paiement accepté - En cours de traitement
+        {% elseif order.isPaid == 2 %}
+            En cours de livraison
+        {% elseif order.isPaid == 3 %}
+            Livré
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h4 class="mt-4">Détails de la commande :</h4>
+    <br>
+
+    <table class="table">
+    <thead class="alert alert-dark" role="alert">
+        <tr>
+            <th scope="col" class="text-center">Formule</th>
+            <th scope="col" class="text-center">Quantité</th>
+            <th scope="col" class="text-center">Produits</th>
+            <th scope="col" class="text-center">Prix unitaire</th>
+            <th scope="col" class="text-center">Prix total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set groupedFormules = {} %}
+
+        {% for formule in order.orderDetails %}
+            {% set formuleKey = formule.formuleId %}
+            {% set groupedFormules = groupedFormules|merge({(formuleKey): groupedFormules[formuleKey]|default([])|merge([formule])}) %}
+        {% endfor %}
+
+        {% for formuleKey, formules in groupedFormules %}
+
+            <tr>
+                <td scope="row" class="text-center">{{ formules[0].formule }}</td>
+                <td class="text-center">{{ formules[0].quantity }}</td>
+                <td class="text-center">{{ formules|map(item => item.product)|join(', ') }}</td>
+                <td class="text-center">{{ (formules[0].price / 100) |number_format(2, ',', '.') }} €</td>
+                <td class="text-center">{{ (formules[0].total / 100) |number_format(2, ',', '.')}} €</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+    <div class="text-end mt-4">
+        <strong>Sous-total : </strong>{{ (order.getTotal / 100) |number_format(2, ',', '.') }} €<br>
+        <strong>Livraison : </strong>{{ (order.deliveryPrice / 100) |number_format(2, ',', '.') }} €<br>
+        <strong>Total : </strong>{{ ((order.deliveryPrice + order.getTotal) / 100)|number_format(2, ',', '.') }} €
+        
+    </div>
+    <a id='a-pdf'  href="{{ path ('app_account_order_pdf' ,{ 'reference' : order.reference })}}" ><div class="download-button-container">
+    
+            <img src="{{asset('assets/img/pdf.png')}}" alt="Icone Téléchargement" class="download-icon me-2" height='30px'>
+            <div class="download-button">Télécharger ma facture</div>
+        </div></a>
+</div>
+{% endblock %}
+
+
+
+{# {% extends 'base.html.twig' %}
+
+{% block title %}Ma commande - Mon P'tit Matin {% endblock %}
+
+{% block content %}
+<div class="container">
+<br>
+<a href="{{ path('app_account_order') }}">
+    <img id='redirection' src="{{ asset('assets/img/fleche-droite.png')}}" alt="retour">
+</a>
+<br><br>
+<center><h1>Ma commande {{order.reference}}</h1></center>
+<br>
+<hr>
+<strong>Commande passée le :</strong> {{ order.createdAt|date('d/m/Y') }} <br>
+<strong>Référence de la commande : </strong>{{order.reference}} <br>
+<strong>Date et horaire de livraison :</strong> {{order.delivery}} <br>
+<strong>Type de livraison : </strong>{{ order.deliveryName|replace({ '[sp]' : ' '})}}
+ 
+<hr>
+<strong>Détails :</strong> <br> <br>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Formule</th>
+      <th scope="col">Quantité</th>
+      <th scope="col">Produits</th>
+      <th scope="col">Prix unitaire</th>
+      <th scope="col">Prix total</th>
+     
+
+    </tr>
+  </thead>
+  <tbody>
+  {% set previousFormule = null %}
+  {% for formule in order.orderDetails %}
+    {% if previousFormule == null or previousFormule != formule.formule %}
+    {% if  previousFormule != null %})</td></tr>{% endif %}
+    <tr>
+    
+      <td scope="row">{{formule.formule }}</td>
+      <td>{{formule.quantity}}</td>
+      
+      
+      {% set previousFormule = formule.formule %}<td>(
+        
+    {% endif %} 
+    
+    
+      {{ formule.product}} , 
+
+   {% endfor %}    ) 
+      
+     
+
+  </tbody>
+</table>
+ <div class="text-end mt-4">
+        
+        <strong>Sous-total : </strong>{{ (order.getTotal / 100) |number_format(2,',','.') }} €<br>
+        <strong>Livraison : </strong>{{ (order.deliveryPrice / 100) |number_format(2,',','.') }} €<br>
+        <strong>Total : </strong>{{ ((order.deliveryPrice + order.getTotal) / 100)|number_format(2,',','.') }} €
+
+     </div>  
+</div>
+
+  
+{% endblock %} #}
