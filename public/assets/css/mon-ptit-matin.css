@@ -1,0 +1,556 @@
+*{
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    max-width: 100%;
+    font-family: 'Rubik', sans-serif;
+}
+body{
+    background-color: #f2f2f2;
+}
+/* Header */
+
+ header{
+    z-index: -2;
+    background-color: #132226;
+
+
+}
+#panierAdd{
+    text-decoration: none;
+    color: darkslategrey;
+}
+#panierAdd :hover{
+    opacity: 0.8;
+}
+.panier-add{
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    top: 126px;
+    right: 20px;
+    width: 300px;
+    height: 120px;
+    position: relative;
+    
+    background-color: white   ;
+    position: absolute;
+    border: green solid 1px;
+}
+.fade-out {
+    transition: opacity 1s ease-out;
+    opacity: 0;
+}
+
+@keyframes loading {
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 90%;
+    }
+}
+
+
+.loading-bar {
+    height: 4px;
+    background-color: #40ff00; /* Couleur de la barre de chargement */
+    animation: loading 3s linear forwards; /* Durée de l'animation égale à celle du setTimeout */
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+header li a{
+    font-size: 20px!important;
+
+}
+
+header li a:hover,
+header .navbar-item-custom a:hover {
+        padding: 10px;
+
+    font-family: 'Protest Revolution', sans-serif;
+    text-decoration: underline;
+    transform: scale(1.10);
+    opacity: 0.8; /* Réduit légèrement l'opacité au survol */
+}
+
+#logo{
+    height: 80px;
+}
+.cart{
+position: relative;
+
+
+}
+
+@media (max-width: 748px) {
+    .cart{
+        width: 20px;
+    }
+    #cart{
+        width: 200%;
+    }
+}
+
+#cart {
+    position: relative;
+    z-index: 3; /* Met #cart en premier plan */
+}
+
+.cadeau {
+    height: 18px;
+    position: absolute;
+    opacity: 0; /* Caché par défaut */
+    transition: opacity 0.8s ease, top 0.5s ease; /* Transition fluide */
+}
+
+#cadeau1 {
+    left: 4px;
+    transform: rotate(348deg);
+    top: 0px; /* Position initiale légèrement plus basse */
+    z-index: 2; /* Met les cadeaux au second plan */
+}
+
+#cadeau3 {
+    left: 14px;
+    transform: rotate(20deg);
+    top: 0px; /* Position initiale légèrement plus basse */
+    z-index: 2;
+}
+
+.cart:hover #cadeau3 {
+    opacity: 1!important; /* Rend les cadeaux visibles */
+    top: -8px; /* Déplace les cadeaux à leur position */
+}.cart:hover #cadeau1 {
+    opacity: 1!important; /* Rend les cadeaux visibles */
+    top: -10px; /* Déplace les cadeaux à leur position */
+}.cart:hover {
+    transform: scale(1.2);
+}
+
+.numbercart{
+
+    background-color: grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 180px;
+    position: absolute;
+    right: -15px;
+    bottom: -10px;
+    z-index: 3;
+}
+/* Fin header */
+
+
+/* ######### */
+/* Home page */
+.homeimagefond{
+    z-index: 3;
+    position: absolute;
+    width: 100%;
+    height: 60vh;
+    background-color: #02020261;
+}
+ .homeimage {
+    background-image: url('/assets/img/fond.png');
+    width: 100%;
+    height: 60vh;
+    background-size: cover;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    position: relative;
+}
+.homeimage a{
+    color: white;
+    text-decoration: none;
+}
+ .offre {
+    max-width: 35%;
+    margin: 0 auto;
+    border-radius: 30px;
+    z-index: 5;
+    font-weight: 900;
+    
+ }
+
+ a.profiter {
+    padding: 15px 30px;
+    margin: 0 auto;
+    background-color: #132226;
+    border-radius: 30px;
+    margin-top: 3rem;
+    z-index: 5;
+    font-weight: bold;
+ }
+
+ a.profiter:hover {
+    background-color: #213a41;
+
+ } 
+
+ img.agricultrice {
+    width: 60%;
+}
+
+p.text-agricultrice {
+    padding: 3rem;
+}
+
+.min {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+.min h2 {
+    background-color: rgb(214, 199, 199);
+    border-radius: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+
+    padding: 20px;
+    width: auto;
+}
+@media (max-width: 950px) {
+    .agriHome .row{
+        flex-direction: column-reverse;
+    }
+
+}
+.numero {
+    color: rgb(122, 103, 103);
+}
+.cityHome {
+    margin-left: 5%;
+    width: 90%;
+}
+    
+/* ######### */
+/* Inscription */
+.registerB{
+    padding: 1rem 3rem;
+}
+/* Nos produits */
+
+.formule {
+    scale: 0.8;
+}
+
+a.voir-formule {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px;
+    background-color: #132226;
+    border-radius: 30px;
+    margin-top: 3rem;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+a.voir-formule:hover {
+    background-color: #213a41;
+
+}
+.formule-item {
+    background: #ffffff;
+    padding-bottom: 10px;
+}
+
+.image-formule {
+    background-size: cover;
+    height: 300px;
+    position: relative;
+}
+
+.formule-price {
+    font-size: 40px;
+}
+
+.formule-nbproduct {
+    font-size: 27px;
+}
+
+/* ######### */
+/* Formule - Formule-name */
+
+label.check {
+    cursor: pointer;
+  }
+  label.check input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  label.check span {
+    padding: 7px 14px;
+      border: 2px solid #132226;
+      display: inline-block;
+      color: black;
+      border-radius: 3px;
+      text-transform: uppercase;
+  }
+  label.check input:checked + span {
+    border-color: #BE9063; 
+    background-color: #BE9063;  
+    color: #fff; 
+  }
+
+/* ######### */
+/* Choix des créneaux horaires */
+
+
+/* ######### */
+
+.about-us {
+    width: 80%;
+    margin-left: 10%;
+}
+/* .main{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+} */
+
+
+/* Partenaires */
+ .producter{
+    width: 100%;
+
+}
+.producter .row{
+    width: 80%;
+    margin-left: 10%;
+
+}
+.producter .row img{
+    border-radius: 20px;
+}
+.producter h1{
+    margin-right: 30%;
+}
+.partenaire{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+} 
+
+/* Fin partenaires */
+
+.account-item {
+    background-color: #f1f2f6;
+    padding: 30px;
+}
+
+.account a{
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #4b6584;
+    font-weight: bold;
+}
+
+.account a:hover{
+    color: #778ca3;
+}
+.account .account-item {
+    margin-bottom: 20px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2); /* Effet d'ombre */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Transition pour l'effet de rétrécissement et d'ombre */
+}
+
+.account .account-item:hover {
+    transform: scale(0.95); /* Réduit légèrement la taille */
+    box-shadow: 0px 12px 20px rgba(0,0,0,0.4); /* Augmente l'ombre */
+}
+
+.account{
+    width: 80%;
+    margin-left: 10%;
+}
+/*  */
+
+/* redirection */
+#redirection {
+    margin-left: 25%;
+    height: 60px;
+    transform: rotate(180deg);
+    transition: transform 0.7s ease; /* Ajoute une transition pour l'effet de rotation */
+}
+
+#redirection:hover {
+    transform: rotate(540deg); /* Effectue un tour complet (360 + 180) lors du survol */
+}
+
+/*  */
+.page-produit{
+    width: 80%;
+    margin-left: 10%;
+}
+
+.image_produit{
+    width: 100% ;
+    height: auto;      
+    border-radius: 20px;
+}
+
+/* footer */
+.footer {
+    background-color: rgb(226, 222, 208);
+}
+footer p {
+    margin: 0;
+}
+.foot{
+    bottom: 0;
+    width: 100%;
+    background-color: rgb(226, 222, 208);
+
+}
+html{
+    position: relative;
+    min-height: 100vh;
+}
+/*  */
+/* bg class */
+.bg-basic{
+    background-color: #132226;
+    color: white;
+}
+.bg-basic:hover{
+    background-color: #2a4249;
+    color: white;
+}
+/* SHOW PRODUCT */
+.disabled {
+    pointer-events: none; /* Désactive les événements de clic */
+    opacity: 0.5; /* Diminue l'opacité pour simuler un bouton grisé */
+}
+
+.cartbtnactive:hover .disabled-info {
+    
+        opacity: 1;
+
+}
+.disabled-info{
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+
+}
+.formule-description{
+    border-radius: 10px;
+    padding: 25px;
+    
+}
+
+/* PANIER */
+td i{
+    font-size: 12px;
+}
+
+.croller{
+    padding: 10px;
+    border-radius: 10px;
+    background-color: white;
+    overflow-y: scroll;
+    max-height: 300px;
+}
+/* .croller .my-auto{
+    width: auto;
+} */
+.w-40p{
+    width: 40%;
+}
+.order{
+    width: 80%;
+    margin-left: 10%;
+}
+
+/* ################ */
+/* Order_show */
+.download-button-container{
+    background-color: #ffffff;
+    border: #2a4249 1.5px solid;
+    border-radius: 5px;
+    color: #2a4249;
+    padding: 10px;
+    width: fit-content;    
+    display: flex;
+    font-weight: bold;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s , color 0.3s;
+}
+#a-pdf{
+    text-decoration: none;
+}
+.download-button-container:hover  {
+    background-color: #2a4249; /* Changement de couleur de fond au survol */
+    color: #ffffff; /* Changement de couleur du texte au survol */
+  }
+  
+/* Responsive */
+.login{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.image-option .col-md-5{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+@media (max-width: 848px) {
+  
+    .partenaire{
+        display: flex;
+        flex-direction: column;
+        margin-top: 15px;
+        align-items: center;
+
+    }
+    .login form{
+        width: 50%!important;
+    }
+}
+@media (max-width: 1000px) {
+    .page-produit{
+        width: 90%;
+        margin-left: 5%;
+    }
+    .account{
+        width: 90%;
+        margin-left: 5%;
+    }
+    .about-us {
+        width: 90%;
+        margin-left: 5%;
+    }
+    .order{
+        width: 90%;
+        margin-left: 5%;
+    }
+    .producter .row{
+        width: 90%;
+        margin-left: 5%;
+    
+    }
+  
+}
+
+
